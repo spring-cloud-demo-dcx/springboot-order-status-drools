@@ -1,0 +1,28 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: dev
+  application:
+    name: skuu-service
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://ip:port/video_chat?serverTimezone=GMT%2B8&characterEncoding=utf-8&useSSL=true
+    username:
+    password:
+  swagger:
+    enable: true
+    groupName: 接口文档
+    basePackage: com.skuu.controller
+    version: 1.0.0
+    title: 接口文档
+    description: 开发文档
+    contactName: daichangxia
+    contactEmail: 807404400@qq.com
+    contactUrl: skuu.cn
+    host: skuu.cn
+
+#mybatis-plus配置控制台打印完整带参数SQL语句
+logging:
+  level:
+    com.skuu.socketio.mapper: debug
