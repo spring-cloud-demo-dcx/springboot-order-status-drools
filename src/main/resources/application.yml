@@ -13,7 +13,7 @@ spring:
   swagger:
     enable: true
     groupName: 接口文档
-    basePackage: com.skuu.controller
+    basePackage: cn.skuu.controller
     version: 1.0.0
     title: 接口文档
     description: 开发文档
@@ -21,8 +21,28 @@ spring:
     contactEmail: 807404400@qq.com
     contactUrl: skuu.cn
     host: skuu.cn
+  redis:
+    enable: false
+    # Redis数据库索引（默认为0）
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password:
+    # 链接超时时间 单位 ms（毫秒）
+    timeout: 3000
+    ################ Redis 线程池设置 ##############
+    jedis:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制） 默认 8
+        max-active: 8
+        # 连接池最大阻塞等待时间（使用负值表示没有限制） 默认 -1
+        max-wait: -1
+        # 连接池最大阻塞等待时间（使用负值表示没有限制） 默认 -1
+        max-idle: 8
+        # 连接池中的最小空闲连接 默认 0
+        min-idle: 0
 
 #mybatis-plus配置控制台打印完整带参数SQL语句
 logging:
   level:
-    com.skuu.socketio.mapper: debug
+    cn.skuu.mapper: debug
