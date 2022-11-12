@@ -16,13 +16,11 @@ import java.util.Collections;
  * @author dcx
  * @since 2022-09-18 19:43
  **/
-@Component
-public class SpringfoxSwaggerHostResolver implements WebMvcOpenApiTransformationFilter {
+public class SpringfoxSwaggerHostResolver {
 
     @Autowired
     private SwaggerProperties swaggerProperties;
 
-    @Override
     public OpenAPI transform(OpenApiTransformationContext<HttpServletRequest> context) {
         OpenAPI swagger = context.getSpecification();
         Server server = new Server();
@@ -31,7 +29,6 @@ public class SpringfoxSwaggerHostResolver implements WebMvcOpenApiTransformation
         return swagger;
     }
 
-    @Override
     public boolean supports(@NotNull DocumentationType delimiter) {
         return DocumentationType.OAS_30.equals(delimiter);
     }

@@ -36,7 +36,7 @@ public class LogAspect {
     private ObjectMapper objectMapper;
 
     // 定义切点Pointcut
-    @Pointcut("execution(* com.skuu.controller..*.*(..))")
+    @Pointcut("execution(* cn.skuu.controller..*.*(..))")
     public void excudeService() {
     }
 
