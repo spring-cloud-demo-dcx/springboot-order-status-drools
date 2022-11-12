@@ -2,6 +2,7 @@ package cn.skuu.common.config;
 
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,8 @@ public class SwaggerConfig {
 
     @Autowired
     private SwaggerProperties swaggerProperties;
+    @Value("${spring.application.name}")
+    private String name;
 
     @Bean
     public Docket adminApi() {
@@ -41,7 +44,7 @@ public class SwaggerConfig {
                 .apiInfo(getAdminApiInfo())
                 .host(swaggerProperties.getHost())
                 // API 分组
-                .groupName(swaggerProperties.getGroupName())
+                .groupName(name)
                 .select()
                 // 对某个包的接口进行监听
                 .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
