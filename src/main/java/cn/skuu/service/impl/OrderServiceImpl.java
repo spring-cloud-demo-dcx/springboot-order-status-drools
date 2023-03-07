@@ -4,6 +4,7 @@ import cn.skuu.entity.Order;
 import cn.skuu.enums.OrderStatus;
 import cn.skuu.enums.OrderStatusChangeEvent;
 import cn.skuu.service.IOrderService;
+import cn.skuu.service.OrderStateMachineConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -30,57 +31,53 @@ public class OrderServiceImpl implements IOrderService {
     @Autowired
     private StateMachinePersister<OrderStatus, OrderStatusChangeEvent, Order> persister;
 
-    //暂时存储在本地
-    private int id = 1;
-    private Map<Integer, Order> orders = new HashMap<>();
-
     @Override
     public Order create() {
         Order order = new Order();
-        order.setId(id++);
+        order.setId(1);
         order.setStatus(OrderStatus.WAIT_PAYMENT);
-        orders.put(id, order);
+        OrderStateMachineConfig.orderMap.put(1, order);
         return order;
     }
 
 
     @Override
     public Order pay(int id) {
-        Order order = orders.get(id);
-        System.out.println("线程名称：" + Thread.currentThread().getName() + " 尝试支付，订单号：" + id);
+        Order order = OrderStateMachineConfig.orderMap.get(id);
+        System.out.println("线程名称：" + Thread.currentThread().getName() + " 尝试支付，订单号：" + order);
         Message<OrderStatusChangeEvent> message = MessageBuilder.withPayload(OrderStatusChangeEvent.PAYED).
                 setHeader("order", order).build();
         if (!sendEvent(message, order)) {
             System.out.println("线程名称：" + Thread.currentThread().getName() + " 支付失败, 状态异常，订单号：" + id);
         }
-        return orders.get(id);
+        return OrderStateMachineConfig.orderMap.get(id);
     }
 
     @Override
     public Order deliver(int id) {
-        Order order = orders.get(id);
+        Order order = OrderStateMachineConfig.orderMap.get(id);
         System.out.println("线程名称：" + Thread.currentThread().getName() + " 尝试发货，订单号：" + id);
         if (!sendEvent(MessageBuilder.withPayload(OrderStatusChangeEvent.DELIVERY)
-                .setHeader("order", order).build(), orders.get(id))) {
+                .setHeader("order", order).build(), OrderStateMachineConfig.orderMap.get(id))) {
             System.out.println("线程名称：" + Thread.currentThread().getName() + " 发货失败，状态异常，订单号：" + id);
         }
-        return orders.get(id);
+        return OrderStateMachineConfig.orderMap.get(id);
     }
 
     @Override
     public Order receive(int id) {
-        Order order = orders.get(id);
+        Order order = OrderStateMachineConfig.orderMap.get(id);
         System.out.println("线程名称：" + Thread.currentThread().getName() + " 尝试收货，订单号：" + id);
         if (!sendEvent(MessageBuilder.withPayload(OrderStatusChangeEvent.RECEIVED)
-                .setHeader("order", order).build(), orders.get(id))) {
+                .setHeader("order", order).build(), OrderStateMachineConfig.orderMap.get(id))) {
             System.out.println("线程名称：" + Thread.currentThread().getName() + " 收货失败，状态异常，订单号：" + id);
         }
-        return orders.get(id);
+        return OrderStateMachineConfig.orderMap.get(id);
     }
 
     @Override
     public Map<Integer, Order> getOrders() {
-        return orders;
+        return OrderStateMachineConfig.orderMap;
     }
 
 
@@ -95,20 +92,24 @@ public class OrderServiceImpl implements IOrderService {
     private synchronized boolean sendEvent(Message<OrderStatusChangeEvent> message, Order order) {
         boolean result = false;
         try {
-            orderStateMachine.startReactively();
+            System.out.println("sendEvent开始order：" + order);
+            orderStateMachine.startReactively().block();
+            // 将会调用read方法将数据库中orderCode记录的状态更新到stateMachine中
+            persister.restore(orderStateMachine, order);
+            System.out.println("执行之前状态：" + orderStateMachine.getState().getId());
             //添加延迟用于线程安全测试
             Thread.sleep(1000);
             Mono<Message<OrderStatusChangeEvent>> messageMono = Mono.just(message);
-            Flux<StateMachineEventResult<OrderStatus, OrderStatusChangeEvent>> stateMachineEventResultFlux = orderStateMachine.sendEvent(messageMono);
-            System.out.println(stateMachineEventResultFlux);
-            StateMachineEventResult<OrderStatus, OrderStatusChangeEvent> result1 = stateMachineEventResultFlux.blockFirst();
-            StateMachineEventResult.ResultType resultType = result1.getResultType();
-            System.out.println(resultType);
-            return resultType.compareTo(StateMachineEventResult.ResultType.ACCEPTED) == 0;
+            orderStateMachine.sendEvent(messageMono).doOnComplete(() -> {
+                System.out.println("Event handling complete");
+            }).subscribe();
+            System.out.println("执行之后状态：" + orderStateMachine.getState().getId());
+            persister.persist(orderStateMachine, order);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            orderStateMachine.stopReactively();
+            orderStateMachine.stopReactively().block();
         }
         return false;
     }
