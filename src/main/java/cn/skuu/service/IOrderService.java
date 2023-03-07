@@ -11,7 +11,7 @@ import java.util.Map;
  **/
 public interface IOrderService {
     //创建新订单
-    Order create();
+    Order create(Integer id);
     //发起支付
     Order pay(int id);
     //订单发货

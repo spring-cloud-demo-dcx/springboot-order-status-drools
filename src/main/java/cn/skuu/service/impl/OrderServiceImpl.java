@@ -32,7 +32,7 @@ public class OrderServiceImpl implements IOrderService {
     private StateMachinePersister<OrderStatus, OrderStatusChangeEvent, Order> persister;
 
     @Override
-    public Order create() {
+    public Order create(Integer id) {
         Order order = new Order();
         order.setId(1);
         order.setStatus(OrderStatus.WAIT_PAYMENT);
@@ -98,7 +98,7 @@ public class OrderServiceImpl implements IOrderService {
             persister.restore(orderStateMachine, order);
             System.out.println("执行之前状态：" + orderStateMachine.getState().getId());
             //添加延迟用于线程安全测试
-            Thread.sleep(1000);
+//            Thread.sleep(1000);
             Mono<Message<OrderStatusChangeEvent>> messageMono = Mono.just(message);
             orderStateMachine.sendEvent(messageMono).doOnComplete(() -> {
                 System.out.println("Event handling complete");
