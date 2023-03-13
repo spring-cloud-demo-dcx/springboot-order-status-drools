@@ -29,7 +29,7 @@ import java.util.Map;
 @EnableStateMachine
 public class OrderStateMachineConfig extends StateMachineConfigurerAdapter<OrderStatus, OrderStatusChangeEvent> {
     //暂时存储到本地
-    public static final Map<Integer, Order> orderMap = new HashMap<>();
+    public static final Map<Integer, Order> orderMap = new HashMap<>(100000);
 
     /**
      * 配置状态

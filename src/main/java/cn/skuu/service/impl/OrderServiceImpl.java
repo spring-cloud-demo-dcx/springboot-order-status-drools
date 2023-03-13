@@ -34,9 +34,9 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public Order create(Integer id) {
         Order order = new Order();
-        order.setId(1);
+        order.setId(id);
         order.setStatus(OrderStatus.WAIT_PAYMENT);
-        OrderStateMachineConfig.orderMap.put(1, order);
+        OrderStateMachineConfig.orderMap.put(id, order);
         return order;
     }
 
