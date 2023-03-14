@@ -12,4 +12,8 @@ import lombok.Data;
 public class Order {
     private int id;
     private OrderStatus status;
+    //价格
+    private int price;
+    //积分
+    private int score;
 }

@@ -1,0 +1,30 @@
+//同一个包名下面可以相互引用
+package order_rules
+import cn.skuu.entity.Order
+
+//100元以下，不加分
+rule "order score rule1"
+when
+    $order:Order(price<100)
+then
+    $order.setScore(0);
+    System.out.println("触发了规则，100元以下，不加分");
+end
+
+//100元到500元，加100分
+rule "order score rule2"
+when
+    $order:Order(price>=100 && price<=500)
+then
+    $order.setScore(100);
+    System.out.println("触发了规则，100元到500元，加100分");
+end
+
+//超过500元，加200分
+rule "order score rule3"
+when
+    $order:Order(price>500)
+then
+    $order.setScore(200);
+    System.out.println("触发了规则，超过500元，加200分");
+end
