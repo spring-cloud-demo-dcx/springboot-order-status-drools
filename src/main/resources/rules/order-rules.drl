@@ -5,6 +5,7 @@ import cn.skuu.entity.Order
 //100元以下，不加分
 rule "order score rule1"
 when
+    //赋值：条件
     $order:Order(price<100)
 then
     $order.setScore(0);

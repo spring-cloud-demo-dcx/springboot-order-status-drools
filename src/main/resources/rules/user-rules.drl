@@ -1,0 +1,16 @@
+//同一个包名下面可以相互引用
+package user_rules
+import cn.skuu.entity.User
+
+
+query "query-1"
+    //赋值：条件
+    $user:User(id>1)
+end
+
+query "query-2"(String name)
+    //赋值：条件
+    $user:User(id>1 && userName == name)
+end
+
+

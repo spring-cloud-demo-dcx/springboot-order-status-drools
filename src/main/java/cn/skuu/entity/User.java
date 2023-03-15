@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 public class User {
 
-    @TableId(value = "id", type = IdType.AUTO)
+//    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     private String userId;

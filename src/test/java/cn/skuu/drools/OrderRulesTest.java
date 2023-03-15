@@ -20,4 +20,9 @@ class OrderRulesTest {
         orderRules.getScore(order);
         System.out.println(order);
     }
+
+    @Test
+    void getUser() {
+        orderRules.getUser();
+    }
 }

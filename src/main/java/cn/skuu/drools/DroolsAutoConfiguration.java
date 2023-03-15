@@ -26,6 +26,9 @@ import java.io.IOException;
 public class DroolsAutoConfiguration {
     private static final String RULES_PATH = "rules/";
 
+    /**
+     * 加载规则文件
+     **/
     @Bean
     @ConditionalOnMissingBean(KieFileSystem.class)
     public KieFileSystem kieFileSystem() throws IOException {
@@ -40,7 +43,9 @@ public class DroolsAutoConfiguration {
         ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
         return resourcePatternResolver.getResources("classpath*:" + RULES_PATH + "**/*.*");
     }
-
+    /**
+     * 创建容器
+     **/
     @Bean
     @ConditionalOnMissingBean(KieContainer.class)
     public KieContainer kieContainer() throws IOException {
@@ -69,6 +74,9 @@ public class DroolsAutoConfiguration {
         return kieContainer().getKieBase();
     }
 
+    /**
+     * 会话
+     **/
     @Bean
     //只存在一个
     @ConditionalOnMissingBean(KieSession.class)
